@@ -6,8 +6,9 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   return loggedIn ? (
-    <ShipsScreen />
+    <ShipsScreen onLogout={() => setLoggedIn(false)} />
   ) : (
     <LoginScreen onLoginSuccess={() => setLoggedIn(true)} />
   );
 }
+

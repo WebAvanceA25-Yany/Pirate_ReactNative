@@ -1,108 +1,75 @@
-import useLocalStorage from "./useLocalStorage";
+import useStorage from "./useLocalStorage";
 
-const baseurl = 'https://p.y-any.org:2223/api';
+const BASE_URL = "https://p.y-any.org:2223/api";
 
-//use Fetach
 const useFetch = () => {
-  const { getItem: getToken } = useLocalStorage<string>("token");
+  const { getItem } = useStorage<string>("token");
 
-  const getHeaders = () => {
-    const token = getToken();
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-     console.log("Headers envoyés :", headers);
+  const getHeaders = async () => {
+    const token = await getItem();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
     return headers;
   };
 
-  const GET = async <T>(url: string): Promise<T | undefined> => {
-    try {
-      const response = await fetch(`${baseurl}${url}`, { headers: getHeaders() });
-      return handleResponse<T>(response);
-    } catch (error) {
-      console.error('Error fetching:', error);
-      throw error;
-    }
-  };
-
-  const POST = async <T, T1 = T>(url: string, body: T): Promise<T1 | undefined> => {
-    try {
-      const response = await fetch(`${baseurl}${url}`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify(body),
-      });
-      return handleResponse<T1>(response);
-    } catch (error) {
-      console.error('Error posting:', error);
-      throw error;
-    }
-  };
-
-  const DELETE = async (url: string): Promise<void> => {
-    try {
-      const response = await fetch(`${baseurl}${url}`, {
-        method: 'DELETE',
-        headers: getHeaders(),
-      });
-      await handleResponse(response);
-    } catch (error) {
-      console.error('Error deleting:', error);
-      throw error;
-    }
-  };
-
-  const PATCH = async <T>(url: string, body: T): Promise<void | undefined> => {
-    try {
-      const response = await fetch(`${baseurl}${url}`, {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify(body),
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Error patching:', error);
-      throw error;
-    }
-  };
-
-  const PUT = async <T, T1 = T>(url: string, body: T): Promise<T1 | undefined> => {
-    try {
-      const response = await fetch(`${baseurl}${url}`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(body),
-      });
-      return handleResponse<T1>(response);
-    } catch (error) {
-      console.error('Error putting:', error);
-      throw error;
-    }
-  };
-
-  async function handleResponse<T>(response: Response): Promise<T | undefined> {
+  const handleResponse = async <T>(response: Response): Promise<T | undefined> => {
     if (!response.ok) {
-      if (response.status === 500) throw new Error('Internal server error');
-      if (response.status === 404) return undefined as T;
-      if (response.status === 400) throw new Error("Ton payload n'est pas bon");
-      throw new Error(`Error: ${response.status} - ${response.statusText}`);
+      const text = await response.text();
+      throw new Error(`Error: ${response.status} - ${text}`);
     }
-
     const contentType = response.headers.get("content-type");
     if (contentType && contentType.includes("application/json")) {
-      try {
-        return (await response.json()) as T;
-      } catch (err) {
-        console.warn("Réponse vide ou JSON invalide :", err);
-        return undefined;
-      }
+      return (await response.json()) as T;
     }
-
     return undefined;
-  }
+  };
 
-  return { GET, POST, PATCH, DELETE, PUT };
+  const GET = async <T>(endpoint: string): Promise<T | undefined> => {
+    const headers = await getHeaders();
+    const res = await fetch(`${BASE_URL}${endpoint}`, { method: "GET", headers });
+    return handleResponse<T>(res);
+  };
+
+  const POST = async <TBody, TRes = TBody>(endpoint: string, body: TBody): Promise<TRes | undefined> => {
+    const headers = await getHeaders();
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+    return handleResponse<TRes>(res);
+  };
+
+  const PATCH = async <TBody, TRes = TBody>(endpoint: string, body: TBody): Promise<TRes | undefined> => {
+    const headers = await getHeaders();
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body),
+    });
+    return handleResponse<TRes>(res);
+  };
+
+  const PUT = async <TBody, TRes = TBody>(endpoint: string, body: TBody): Promise<TRes | undefined> => {
+    const headers = await getHeaders();
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(body),
+    });
+    return handleResponse<TRes>(res);
+  };
+
+  const DELETE = async (endpoint: string): Promise<void> => {
+    const headers = await getHeaders();
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
+      method: "DELETE",
+      headers,
+    });
+    await handleResponse(res);
+  };
+
+  return { GET, POST, PATCH, PUT, DELETE };
 };
 
 export default useFetch;

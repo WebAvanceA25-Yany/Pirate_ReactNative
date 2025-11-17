@@ -1,34 +1,57 @@
 import { Platform } from "react-native";
 
-let AsyncStorage: any;
+let AsyncStorage: any = null;
+
 if (Platform.OS !== "web") {
-  AsyncStorage = require('@react-native-async-storage/async-storage').default;
+  try {
+    AsyncStorage = require("@react-native-async-storage/async-storage").default;
+  } catch (e) {
+    console.warn("AsyncStorage non disponible :", e);
+  }
 }
 
 const useStorage = <T>(key: string) => {
-  const setItem = async (value: T) => {
-    const data = JSON.stringify(value);
+
+  const setItem = async (value: T): Promise<void> => {
+    const json = JSON.stringify(value);
+
     if (Platform.OS === "web") {
-      localStorage.setItem(key, data);
-    } else {
-      await AsyncStorage.setItem(key, data);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(key, json);
+      }
+      return;
+    }
+
+    if (AsyncStorage) {
+      await AsyncStorage.setItem(key, json);
     }
   };
 
   const getItem = async (): Promise<T | null> => {
-    let item: string | null = null;
+    let raw: string | null = null;
+
     if (Platform.OS === "web") {
-      item = localStorage.getItem(key);
+      if (typeof localStorage !== "undefined") {
+        raw = localStorage.getItem(key);
+      }
     } else {
-      item = await AsyncStorage.getItem(key);
+      if (AsyncStorage) {
+        raw = await AsyncStorage.getItem(key);
+      }
     }
-    return item ? JSON.parse(item) : null;
+
+    return raw ? JSON.parse(raw) : null;
   };
 
-  const removeItem = async () => {
+  const removeItem = async (): Promise<void> => {
     if (Platform.OS === "web") {
-      localStorage.removeItem(key);
-    } else {
+      if (typeof localStorage !== "undefined") {
+        localStorage.removeItem(key);
+      }
+      return;
+    }
+
+    if (AsyncStorage) {
       await AsyncStorage.removeItem(key);
     }
   };
