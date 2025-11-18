@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import LoginScreen from "./components/login";
-import ShipsScreen from "./components/ships";
+import ShipsScreen from "./components/HomeScreen";
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
