@@ -1,23 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Button, ScrollView } from "react-native";
 import useFetch from "../composables/useFetch";
+import { styles } from "../css/listeShip"; // Ton fichier CSS séparé
 
 const ListShips = () => {
   const { GET } = useFetch();
   const [ships, setShips] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedShip, setSelectedShip] = useState<any>(null);
+
   const loadShips = async () => {
     try {
       setError(null);
-
       const res = await GET<any[]>("/ships");
-
-      if (res) {
-        setShips(res);
-      } else {
-        setShips([]);
-      }
+      setShips(res || []);
     } catch (e: any) {
       setError("Impossible de charger les bateaux.");
       console.log("Erreur ships :", e);
@@ -28,74 +26,72 @@ const ListShips = () => {
     loadShips();
   }, []);
 
+
+  const handleLongPress = (ship: any) => {
+    setSelectedShip(ship);
+    setModalVisible(true);
+  };
+
   if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
+    return <Text> {error} </Text>;
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Liste des Bateaux</Text>
+      <ScrollView>
+        {ships.length === 0 ? (
+          <Text style={styles.empty}>Aucun bateau pour le moment.</Text>
+        ) : (
+          ships.map((ship, i) => (
+            <TouchableOpacity
+              key={i}
+              style={styles.row}
+              onLongPress={() => handleLongPress(ship)}
+            >
+              <Text style={styles.cellName}>{ship.name}</Text>
+              <Text style={styles.cell}>{ship.captain}</Text>
+              <Text style={styles.cell}>{ship.goldCargo} Or</Text>
+              <Text style={styles.cell}>{ship.crewSize} Or</Text>
+              <Text style={styles.cell}>{ship.status}</Text>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
 
-      {ships.length === 0 ? (
-        <Text style={styles.empty}>Aucun bateau pour le moment.</Text>
-      ) : (
-        ships.map((ship, i) => (
-          <View key={i} style={styles.shipCard}>
-            <Text style={styles.shipName}>{ship.name}</Text>
-            <Text style={styles.shipInfo}> goldCargo :{ship.goldCargo}</Text>
-            <Text style={styles.shipInfo}> captain : {ship.captain}</Text>
-            <Text style={styles.shipInfo}> status :{ship.status}</Text>
-            <Text style={styles.shipInfo}> crewSize : {ship.crewSize}</Text>
-            <Text style={styles.shipInfo}> createdBy : {ship.createdBy}</Text>
-            <Text style={styles.shipInfo}> createdAt : {ship.createdAt}</Text>
-            <Text style={styles.shipInfo}> updatedAt : {ship.updatedAt}</Text>            
+      {/* Le modal avec les informations du ship. on va mettre les supprimer ajouter dans ce modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {selectedShip && (
+              <>
+                <Text style={styles.modalTitle}>{selectedShip.name}</Text>
+                <Text style={styles.infoText}>Capitaine : {selectedShip.captain}</Text>
+                <Text style={styles.infoText}>Équipage : {selectedShip.crewSize}</Text>
+                <Text style={styles.infoText}>Trésor : {selectedShip.goldCargo}</Text>
+                <Text style={styles.infoText}>Statut : {selectedShip.status}</Text>
+                <Text style={styles.infoText}>Créé par : {selectedShip.createdBy}</Text>
+
+                <View style={styles.modalButtons}>
+                  <View style={{ width: 10 }} />
+                  <Button
+                    title="Fermer"
+                    color="grey"
+                    onPress={() => setModalVisible(false)}
+                  />
+                </View>
+              </>
+            )}
           </View>
-        ))
-    )}
+        </View>
+      </Modal>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  container: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 20,
-  },
-  shipCard: {
-    backgroundColor: "#f3f3f3",
-    padding: 15,
-    marginBottom: 12,
-    borderRadius: 8,
-  },
-  shipName: {
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  shipInfo: {
-    fontSize: 14,
-    color: "#555",
-  },
-  empty: {
-    fontSize: 16,
-    color: "#777",
-  },
-  error: {
-    fontSize: 16,
-    color: "red",
-  },
-});
 
 export default ListShips;

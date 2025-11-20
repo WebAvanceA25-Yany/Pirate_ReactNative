@@ -7,7 +7,7 @@ interface LoginScreenProps {
   onLoginSuccess?: () => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
+const LoginScreen = ({ onLoginSuccess }: LoginScreenProps) => {
   const { POST } = useFetch();
   const { setItem: setToken } = useLocalStorage<string>("token");
 

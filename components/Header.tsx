@@ -6,8 +6,7 @@ import useLocalStorage from "../composables/useLocalStorage";
 interface HeaderProps {
   onLogout?: () => void;
 }
-
-const Header: React.FC<HeaderProps> = ({ onLogout }) => {
+const Header = ({ onLogout } : HeaderProps) => {
   const { GET, POST } = useFetch();
   const { removeItem: removeToken } = useLocalStorage<string>("token");
 
