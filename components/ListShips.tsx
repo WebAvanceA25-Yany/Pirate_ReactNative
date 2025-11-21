@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Modal, Button, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Modal, Button, ScrollView, Alert, StyleSheet } from "react-native";
 import useFetch from "../composables/useFetch";
 import { styles } from "../css/listeShip";
 
@@ -8,9 +8,11 @@ interface ListShipsProps {
 }
 
 const ListShips = ({ onAdd }: ListShipsProps) => {
-  const { GET } = useFetch();
+  const { GET, DELETE } = useFetch();
   const [ships, setShips] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedShip, setSelectedShip] = useState<any>(null);
@@ -30,9 +32,34 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
     loadShips();
   }, []);
 
+  // IA pour la selection multiple 
+  // cela cree une sonst qui les entregistre
+  const toggleSelection = (id: number) => {
+    if (selectedIds.includes(id)) {
+      // Si déjà sélectionné, on le retire
+      setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
+    } else {
+      // Sinon on l'ajoute
+      setSelectedIds([...selectedIds, id]);
+    }
+  };
+
   const handleLongPress = (ship: any) => {
     setSelectedShip(ship);
     setModalVisible(true);
+  };
+
+  const handleDelete = async () => {      
+            try {
+              for (const id of selectedIds) {
+                await DELETE(`/ships/${id}`);
+              }
+              setSelectedIds([]);
+              loadShips();
+            } catch (e) {
+              console.log("Erreur delete", e);
+              setError("Impossible de supprimer certains navires.");
+            } 
   };
 
   if (error) {
@@ -42,28 +69,47 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Liste des Bateaux</Text>
+      
       <ScrollView>
         {ships.length === 0 ? (
           <Text style={styles.empty}>Aucun bateau pour le moment.</Text>
         ) : (
-          ships.map((ship, i) => (
-            <TouchableOpacity
-              key={i}
-              style={styles.row}
-              onLongPress={() => handleLongPress(ship)}
-            >
-              <Text style={styles.cellName}>{ship.name}</Text>
-              <Text style={styles.cell}>{ship.captain}</Text>
-              <Text style={styles.cell}>{ship.goldCargo} Or</Text>
-              <Text style={styles.cell}>{ship.crewSize} Or</Text>
-              <Text style={styles.cell}>{ship.status}</Text>
-            </TouchableOpacity>
-          ))
+          ships.map((ship, i) => {
+            // Vérifie si le navire est sélectionné
+            const isSelected = selectedIds.includes(ship.id);
+
+            return (
+              <TouchableOpacity
+                key={i}
+                style={[
+                  styles.row,
+                  isSelected && { backgroundColor: "#d3eafc", borderColor: "#2196F3" }
+                ]}
+                onPress={() => toggleSelection(ship.id)}
+                onLongPress={() => handleLongPress(ship)}
+              >             
+                <Text >
+                  {isSelected ? "x" : ""}
+                </Text>
+
+                <Text style={styles.cellName}>{ship.name}</Text>
+                <Text style={styles.cell}>{ship.captain}</Text>
+                <Text style={styles.cell}>{ship.goldCargo} Or</Text>
+                <Text style={styles.cell}>{ship.crewSize} H.</Text>
+                <Text style={styles.cell}>{ship.status}</Text>
+              </TouchableOpacity>
+            );
+          })
         )}
       </ScrollView>
 
-      <View>
-        <Button title="Ajouter ships" onPress={onAdd} />
+      <View style={{ padding: 10 }}>
+          <Button
+            title={`Supprimer (${selectedIds.length})`}
+            color="red"
+            onPress={handleDelete}
+          />
+          <Button title="Ajouter ships" onPress={onAdd} />
       </View>
 
       <Modal
