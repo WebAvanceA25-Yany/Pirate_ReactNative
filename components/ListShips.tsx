@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, Modal, Button, ScrollView } from "react-native";
 import useFetch from "../composables/useFetch";
-import { styles } from "../css/listeShip"; // Ton fichier CSS séparé
+import { styles } from "../css/listeShip";
 
-const ListShips = () => {
+interface ListShipsProps {
+  onAdd: () => void;
+}
+
+const ListShips = ({ onAdd }: ListShipsProps) => {
   const { GET } = useFetch();
   const [ships, setShips] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +29,6 @@ const ListShips = () => {
   useEffect(() => {
     loadShips();
   }, []);
-
 
   const handleLongPress = (ship: any) => {
     setSelectedShip(ship);
@@ -59,7 +62,10 @@ const ListShips = () => {
         )}
       </ScrollView>
 
-      {/* Le modal avec les informations du ship. on va mettre les supprimer ajouter dans ce modal */}
+      <View>
+        <Button title="Ajouter ships" onPress={onAdd} />
+      </View>
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -76,6 +82,8 @@ const ListShips = () => {
                 <Text style={styles.infoText}>Trésor : {selectedShip.goldCargo}</Text>
                 <Text style={styles.infoText}>Statut : {selectedShip.status}</Text>
                 <Text style={styles.infoText}>Créé par : {selectedShip.createdBy}</Text>
+                <Text style={styles.infoText}>Créé le : {selectedShip.createdAt}</Text>
+                <Text style={styles.infoText}>Modifier le : {selectedShip.updatedAt}</Text>
 
                 <View style={styles.modalButtons}>
                   <View style={{ width: 10 }} />
