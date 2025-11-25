@@ -75,5 +75,15 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 20,
     justifyContent: 'center',
-  }
+  },
+   input: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 5,
+        width: '100%',
+        paddingHorizontal: 10,
+        marginBottom: 5,
+        textAlign: 'center'
+    }
 });

@@ -16,7 +16,8 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedShip, setSelectedShip] = useState<any>(null);
-  const [goldAmount, setGoldAmount] = useState(""); // 2. State pour l'input
+  const [goldAmount, setGoldAmount] = useState("");
+  const [crewAmount, setCrewAmount] = useState("");
 
   const loadShips = async () => {
     try {
@@ -52,12 +53,26 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
 
     try {
         await PATCH(`/ships/${selectedShip.id}/cargo/gold`, { amount: amount });
-        
-        setModalVisible(false);
         loadShips(); 
+      setSelectedShip(await GET(`/ships/${selectedShip.id}`));
+      
     } catch (e) {
-        console.log("Erreur update gold", e);
-        alert("Erreur lors de la mise à jour de l'or (Fonds insuffisants ?)");
+      console.log("Erreur update gold", e);
+      alert("Erreur lors de la mise à jour de l'or (Fonds insuffisants ?)");
+    }
+  };
+  
+  const handleUpdateCrew = async () => {
+    const amount = parseInt(crewAmount);
+    
+    try {
+      await PATCH(`/ships/${selectedShip.id}/crew`, { amount: amount });
+      loadShips(); 
+      setSelectedShip(await GET(`/ships/${selectedShip.id}`));
+
+    } catch (e) {
+        console.log("Erreur update crew", e);
+        alert("Impossible de modifier l'équipage (Min 1 et Max 500)");
     }
   };
 
@@ -138,18 +153,35 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
                 </Text>
 
                 <TextInput 
-                    style={localStyles.input}
+                    style={styles.input}
                     keyboardType="numeric" 
                     value={goldAmount}
                     onChangeText={setGoldAmount}
                 />
+                
+
+                <Text style={[styles.infoText, { fontSize: 18, marginVertical: 10 }]}>
+                    crew actuel :  {selectedShip.crewSize}
+                </Text>
+
+                <TextInput  
+                    style={styles.input}
+                    keyboardType="numeric" 
+                    value={crewAmount}
+                    onChangeText={setCrewAmount}
+                />
 
                 <View style={styles.modalButtons}>
                   <Button
-                    title="Valider Transaction"
+                    title="Valider OR"
                     onPress={handleUpdateGold}
                   />
-                  <View style={{ height: 10 }} /> 
+                  <View style={{ height: 10, margin:10 }} /> 
+                  <Button
+                    title="Valider CREW"
+                    onPress={handleUpdateCrew}
+                  />
+                  <View style={{ height: 10, margin:10  }} /> 
                   <Button
                     title="Fermer"
                     color="grey"
@@ -165,18 +197,6 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
   );
 };
 
-// Petit style local pour l'input si tu ne veux pas toucher au CSS global tout de suite
-const localStyles = StyleSheet.create({
-    input: {
-        height: 40,
-        borderColor: 'gray',
-        borderWidth: 1,
-        borderRadius: 5,
-        width: '100%',
-        paddingHorizontal: 10,
-        marginBottom: 5,
-        textAlign: 'center'
-    }
-});
+
 
 export default ListShips;
