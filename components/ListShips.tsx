@@ -173,6 +173,7 @@ const ListShips = ({ onAdd, onTransfer }: ListShipsProps) => {
                 <Text style={styles.cell}>{ship.status}</Text>
                 <Text style={styles.cell}>{ship.createdAt}</Text>
                 <Text style={styles.cell}>{ship.updatedAt}</Text>
+                <Text style={styles.cell}>{ship.pillagedCount}</Text>
               </TouchableOpacity>
             );
           })
