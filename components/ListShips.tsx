@@ -14,9 +14,10 @@ import { styles } from "../css/listeShip";
 
 interface ListShipsProps {
   onAdd: () => void;
+  onTransfer: () => void;
 }
 
-const ListShips = ({ onAdd }: ListShipsProps) => {
+const ListShips = ({ onAdd, onTransfer }: ListShipsProps) => {
   const { GET, DELETE, PATCH, POST } = useFetch();
 
   const [ships, setShips] = useState<any[]>([]);
@@ -46,6 +47,7 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
     loadShips();
   }, []);
 
+  
   const toggleSelection = (id: number) => {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
@@ -178,6 +180,11 @@ const ListShips = ({ onAdd }: ListShipsProps) => {
       </ScrollView>
 
       <View style={{ padding: 10 }}>
+        <Button 
+            title="⇄ Transfert Or" 
+            color="#FFD700" // Couleur Or
+            onPress={onTransfer} 
+        />
         <Button
           title={`Supprimer (${selectedIds.length})`}
           color="red"
