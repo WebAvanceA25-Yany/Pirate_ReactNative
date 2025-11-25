@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Button } from "react-native";
 import useFetch from "../composables/useFetch";
 import useLocalStorage from "../composables/useLocalStorage";
+import { styles } from "../css/headercss";
 
 interface HeaderProps {
   onLogout?: () => void;
@@ -11,13 +12,23 @@ const Header = ({ onLogout } : HeaderProps) => {
   const { removeItem: removeToken } = useLocalStorage<string>("token");
 
   const [user, setUser] = useState<any>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const loadUser = async () => {
     try {
+
       const res = await GET<any>("/auth/me");
       setUser(res.user);
+
+      try {
+        await GET("/auth/check-admin");
+        setIsAdmin(true);
+      } catch {
+        setIsAdmin(false);
+      }
+
     } catch (e) {
-      console.log("Erreur /me :", e);
+      console.log("Erreur chargement user :", e);
     }
   };
 
@@ -35,18 +46,13 @@ const Header = ({ onLogout } : HeaderProps) => {
   }, []);
 
   return (
-    <View
-      style={{
-        width: "100%",
-        padding: 15,
-        backgroundColor: "#eee",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
+    <View style={styles.Viewheader}
     >
       <Text style={{ fontWeight: "bold" }}>
         {user ? `Connecté en tant que : ${user.username}` : "Chargement..."}
+        {isAdmin && (
+            <Text style={styles.adminText}>  ADMIN</Text>
+        )}
       </Text>
 
       <Button title="Logout" onPress={handleLogout} />

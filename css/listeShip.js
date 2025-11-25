@@ -76,7 +76,7 @@ export const styles = StyleSheet.create({
     marginTop: 20,
     justifyContent: 'center',
   },
-   input: {
+  input: {
         height: 40,
         borderColor: 'gray',
         borderWidth: 1,
@@ -85,5 +85,19 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 5,
         textAlign: 'center'
+    },
+  portItem: {
+        padding: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+        backgroundColor: '#f9f9f9',
+        marginBottom: 5,
+        borderRadius: 5,
+        alignItems: 'center'
+    },
+    portText: {
+        fontSize: 16,
+        color: '#333',
+        fontWeight: '500'
     }
 });
