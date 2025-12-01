@@ -20,13 +20,6 @@ const Header = ({ onLogout } : HeaderProps) => {
       const res = await GET<any>("/auth/me");
       setUser(res.user);
 
-      try {
-        await GET("/auth/check-admin");
-        setIsAdmin(true);
-      } catch {
-        setIsAdmin(false);
-      }
-
     } catch (e) {
       console.log("Erreur chargement user :", e);
     }
@@ -50,8 +43,8 @@ const Header = ({ onLogout } : HeaderProps) => {
     >
       <Text style={{ fontWeight: "bold" }}>
         {user ? `Connecté en tant que : ${user.username}` : "Chargement..."}
-        {isAdmin && (
-            <Text style={styles.adminText}>  ADMIN</Text>
+        {user.isAdmin && (
+            <Text style={styles.adminText}>  ADMIN </Text>
         )}
       </Text>
 
