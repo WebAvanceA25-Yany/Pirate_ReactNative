@@ -17,4 +17,4 @@ maestro test .maestro/main_flow.yaml --format junit --output result.xml
 
 Write-Host "Tests Maestro executes"
 Get-Content ".\result.xml"
-#Start-Process ".\result.xml"
+#Start-Process ".\result.xml" ./run-meastro-tests.bat

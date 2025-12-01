@@ -1,4 +1,7 @@
 appId: host.exp.exponent
 ---
+- openLink: "exp://localhost:8081"
+
 - runFlow: ./flows/login_flow.yaml
-- runFlow: ./flows/exit_flow.yaml
+
+

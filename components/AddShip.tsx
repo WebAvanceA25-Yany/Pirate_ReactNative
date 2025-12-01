@@ -64,6 +64,7 @@ const AddShip = ({ onBack }: AddShipProps) => {
 
             <Text style={styles.label}>Nom du navire</Text>
             <TextInput
+                testID="inputName"   
                 style={styles.input}
                 value={name}
                 onChangeText={setName}
@@ -71,6 +72,7 @@ const AddShip = ({ onBack }: AddShipProps) => {
 
             <Text style={styles.label}>Nombre de gold</Text>
             <TextInput
+                testID="inputGold"   
                 style={styles.input}
                 value={goldCargo}
                 onChangeText={setgoldCargo}
@@ -79,15 +81,16 @@ const AddShip = ({ onBack }: AddShipProps) => {
 
             <Text style={styles.label}>Le status du bateau</Text>
             <TextInput
+                testID="inputStatus" 
                 style={styles.input}
                 value={status}
                 onChangeText={setstatus}
                 placeholder="sailing or docked "
-
             />
 
             <Text style={styles.label}>Le capitaine</Text>
             <TextInput
+                testID="inputCaptain" 
                 style={styles.input}
                 value={captain}
                 onChangeText={setcaptain}
@@ -95,6 +98,7 @@ const AddShip = ({ onBack }: AddShipProps) => {
 
             <Text style={styles.label}>Équipage initial</Text>
             <TextInput
+                testID="inputCrew"    
                 style={styles.input}
                 value={crewSize}
                 onChangeText={setcrewSize}
@@ -103,7 +107,10 @@ const AddShip = ({ onBack }: AddShipProps) => {
             />
 
             <View style={styles.buttonContainer}>
-                <Button title={loading ? "Envoi..." : "Créer"} onPress={handleSubmit} disabled={loading} />
+                <View testID="submitShipButton">
+                    <Button title={loading ? "Envoi..." : "Créer"} onPress={handleSubmit} disabled={loading} />
+                </View>
+                
                 <View style={{ height: 10 }} />
                 <Button title="Annuler" color="red" onPress={onBack} />
                 {error && <Text style={styles.label}>{error}</Text>}

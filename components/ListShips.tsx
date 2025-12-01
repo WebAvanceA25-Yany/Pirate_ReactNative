@@ -47,7 +47,7 @@ const ListShips = ({ onAdd, onTransfer }: ListShipsProps) => {
     loadShips();
   }, []);
 
-  
+
   const toggleSelection = (id: number) => {
     if (selectedIds.includes(id)) {
       setSelectedIds(selectedIds.filter((itemId) => itemId !== id));
@@ -181,17 +181,20 @@ const ListShips = ({ onAdd, onTransfer }: ListShipsProps) => {
       </ScrollView>
 
       <View style={{ padding: 10 }}>
-        <Button 
-            title="⇄ Transfert Or" 
-            color="#FFD700" // Couleur Or
-            onPress={onTransfer} 
+        <Button
+          title="⇄ Transfert Or"
+          color="#FFD700" // Couleur Or
+          onPress={onTransfer}
         />
         <Button
           title={`Supprimer (${selectedIds.length})`}
           color="red"
           onPress={handleDelete}
         />
-        <Button title="Ajouter ships" onPress={onAdd} />
+        {/* AJOUT DU TESTID ICI */}
+        <View testID="addShipButton">
+          <Button title="Ajouter ships" onPress={onAdd} />
+        </View>
         <Button
           title="Changer de port ⚓️"
           color="purple"

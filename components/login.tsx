@@ -50,25 +50,29 @@ const LoginScreen = ({ onLoginSuccess }: LoginScreenProps) => {
       <TextInput
         value={username}
         onChangeText={setUsername}
+        testID="usernameInput"
         autoCapitalize="none"
         style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
-
       <Text>Mot de passe</Text>
       <TextInput
         value={password}
         onChangeText={setPassword}
+        testID="passwordInput"
+        placeholder="sss"
         secureTextEntry
         style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
 
       {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
 
-      <Button
-        title={loading ? "Connexion..." : "Se connecter"}
-        onPress={handleLogin}
-        disabled={loading}
-      />
+      <View testID="loginButton"> 
+        <Button
+            title={loading ? "Connexion..." : "Se connecter"}
+            onPress={handleLogin}
+            disabled={loading}
+        />
+      </View>
     </View>
   );
 };

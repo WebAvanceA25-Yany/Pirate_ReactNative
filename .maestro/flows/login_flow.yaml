@@ -1,8 +1,63 @@
-appId: host.exp.exponent
+appId: host.exp.exponent 
 ---
-#- launchApp
-# ⚠️ Assure-toi que ton app Expo est déjà ouverte dans l’émulateur avant d’exécuter ce test.
-- tapOn: "emailInput"
-- inputText: "alain@example.com"
-- tapOn: "submitButton"
-- assertVisible: "Bienvenue alain@example.com"
+- clearState
+- openLink: "exp://localhost:8081" 
+
+# --- Login ---
+- tapOn:
+    id: "usernameInput"
+- inputText: "username" 
+- hideKeyboard
+
+
+- tapOn:
+    id: "passwordInput"
+- inputText: "Password123" 
+- hideKeyboard
+
+- tapOn:
+    id: "loginButton"
+
+# --- Vérification ---
+- assertVisible: "Liste des Bateaux"
+
+
+# 1. Aller sur la page d'ajout
+- tapOn:
+    id: "addShipButton"
+
+# 2. Remplir le formulaire
+- tapOn:
+    id: "inputName"
+- inputText: "Le Black Pearl"
+- hideKeyboard
+
+- tapOn:
+    id: "inputGold"
+- inputText: "5000"
+- hideKeyboard
+
+- tapOn:
+    id: "inputStatus"
+- inputText: "docked"
+- hideKeyboard
+
+- tapOn:
+    id: "inputCaptain"
+- inputText: "Jack Sparrow"
+- hideKeyboard
+
+- tapOn:
+    id: "inputCrew"
+- inputText: "50"
+- hideKeyboard
+
+# 3. Valider
+- tapOn:
+    id: "submitShipButton"
+
+# 4. Gérer l'alerte "Succès" (si une alerte native apparaît)
+- tapOn: "OK" # ou le texte du bouton de votre Alert.alert (souvent "OK" par défaut)
+
+# 5. Vérifier qu'on est revenu sur la liste et que le bateau est là
+- assertVisible: "Le Black Pearl"
